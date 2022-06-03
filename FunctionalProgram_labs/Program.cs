@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Text;
 
@@ -9,7 +10,8 @@ namespace FunctionalProgram_labs
     {
         public static void Main(string[] args)
         {
-            task1_4();
+            task1_2();
+            
         }
 
         //1.1. Печать через Action<T> 
@@ -30,8 +32,7 @@ namespace FunctionalProgram_labs
             var str = Console.ReadLine();
 
             Action<string> print = word => { Console.WriteLine($"{word} (нет в наличии)"); };
-            string[] words = str.Split(' ');
-            foreach (var word in words)
+            foreach (var word in  str.Split(' '))
             {
                 print(word);
             }
@@ -88,23 +89,105 @@ namespace FunctionalProgram_labs
             Console.WriteLine(print(num1,num2,property));
         }
         //2.1 Арифметические операции 
-        public void task2_1()
+        public static void task2_1()
         {
-            var line = Console.ReadLine();
-            while ((line = Console.ReadLine()) != "end")
+            string input = Console.ReadLine();
+            Func<string, int> parser = n => int.Parse(n);
+            int[] numbers = input.Split(new string[] {" "},
+                    StringSplitOptions.RemoveEmptyEntries)
+                .Select(parser).ToArray();
+
+            Action<int[]> add = num => { for(int i =0; i <num.Length; i++)
             {
-               
+                num[i] += 1;
+            } };
+            Action<int[]> print = num => { 
+                for(int i =0; i <num.Length; i++){
+                    Console.Write($"{num[i]} ");
+                }
+                Console.WriteLine();
+            };
+            Action<int[]> multiply = num => { for(int i =0; i <num.Length; i++)
+            {
+                num[i] *= 2;
+            } };
+            Action<int[]> subtract = num => { for(int i =0; i <num.Length; i++)
+            {
+                num[i] -= 1;
+            } };
+
+
+            Func<string, Action<int[]>> choice = condition =>
+            {
+                switch (condition)
+                {
+                    case "add": return add;
+                    case "print": return print;
+                    case "multiply": return multiply;
+                    case "subtract": return subtract;
+                    default: return null;
+                }
+            };
+            
+            string operation = Console.ReadLine();
+            while (operation != "end")
+            {
+                choice(operation)(numbers);
+                operation = Console.ReadLine();
             }
         }
         //2.2. Реверсирование 
-        public void task2_2()
+        public static void task2_2()
         {
+            int[] numbers = Console.ReadLine()
+                .Split(new string[] {" "},
+                    StringSplitOptions.RemoveEmptyEntries)
+                .Select(n => int.Parse(n))
+                .ToArray();
+            int divider = Convert.ToInt32(Console.ReadLine());
             
+            Func<int[], int, List<int>> reverse = (arr, n) =>
+            {
+                
+                List<int> result = new List<int>();
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    if (arr[i] % n != 0)
+                    {
+                        result.Add(arr[i]);
+                    }
+                }
+                result.Reverse();
+                foreach (var i in result)
+                {
+                    Console.Write($"{i} ");
+                }
+                return result;
+            };
+            reverse(numbers, divider);
         }
         //2.3. Фильтрация имен
-        public void task2_3()
+        public static void task2_3()
         {
-            
+            int length = Convert.ToInt32(Console.ReadLine());
+            string[] names = Console.ReadLine().Split(' ').ToArray();
+
+
+            Func<string[], int, List<string>> filter = (arr, n) =>
+            {
+                List<string> result = new List<string>();
+                for (int i = 0; i < arr.Length; i++)
+                {
+                    if (arr[i].Length <= n)
+                    {
+                        result.Add(arr[i]);
+                    }
+                }
+                return result;
+            };
+            Action<List<string>> print = filteredNames => Console.WriteLine(string.Join(" ", filteredNames));
+            print(filter(names, length));
+
         }
         
         //2.4. Компаратор
